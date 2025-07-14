@@ -49,6 +49,9 @@ npm install
 
 print_header "🎯 Act Demo - GitHub Actions Local Runner"
 echo "This demo will show you how to use act to run GitHub Actions workflows locally."
+echo ""
+echo "Note: If you encounter authentication errors with GitHub actions,"
+echo "run './setup-github-auth.sh' to configure a GitHub token."
 
 wait_for_user
 

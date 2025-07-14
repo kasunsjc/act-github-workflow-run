@@ -1,20 +1,22 @@
 # Makefile for Act Demo
 # Use this to run common act commands easily
 
-.PHONY: help install setup demo clean list run test
+.PHONY: help install setup demo clean list run test security verify-gitignore
 
 # Default target
 help:
 	@echo "Act Demo - Available commands:"
-	@echo "  make install    - Install dependencies"
-	@echo "  make setup      - Setup configuration files" 
-	@echo "  make list       - List all workflows"
-	@echo "  make run        - Run all workflows"
-	@echo "  make test       - Run test workflow"
-	@echo "  make ci         - Run CI workflow"
-	@echo "  make demo       - Run interactive demo"
-	@echo "  make clean      - Clean up generated files"
-	@echo "  make dry-run    - Show what would run"
+	@echo "  make install        - Install dependencies"
+	@echo "  make setup          - Setup configuration files" 
+	@echo "  make list           - List all workflows"
+	@echo "  make run            - Run all workflows"
+	@echo "  make test           - Run test workflow"
+	@echo "  make ci             - Run CI workflow"
+	@echo "  make demo           - Run interactive demo"
+	@echo "  make security       - Run security verification"
+	@echo "  make verify-gitignore - Verify gitignore configuration"
+	@echo "  make clean          - Clean up generated files"
+	@echo "  make dry-run        - Show what would run"
 
 # Install npm dependencies
 install:
@@ -59,6 +61,13 @@ clean:
 	rm -rf reports/
 	rm -f .env .secrets .actrc
 	@echo "✅ Cleaned up generated files"
+
+# Security verification
+security: verify-gitignore
+
+# Verify gitignore configuration
+verify-gitignore:
+	./verify-gitignore.sh
 
 # Quick start
 quickstart:

@@ -170,26 +170,42 @@ act --env-file .env
 
 ### Common Issues
 
-1. **Docker not running**
+1. **Authentication Error (GitHub Token Required)**
+   ```
+   Error: authentication required: Support for password authentication was removed...
+   ```
+   **Solution**: Create a GitHub Personal Access Token
+   ```bash
+   # Run the setup script
+   ./setup-github-auth.sh
+   
+   # Or manually:
+   # 1. Go to https://github.com/settings/tokens
+   # 2. Create token with 'public_repo' scope
+   # 3. Add to .secrets file: GITHUB_TOKEN=your_token_here
+   # 4. Run: act --secret-file .secrets
+   ```
+
+2. **Docker not running**
    ```bash
    # Make sure Docker is running
    docker ps
    ```
 
-2. **Permission denied (Linux)**
+3. **Permission denied (Linux)**
    ```bash
    # Add user to docker group
    sudo usermod -aG docker $USER
    # Then log out and back in
    ```
 
-3. **Large Docker images**
+4. **Large Docker images**
    ```bash
    # Use smaller images for faster execution
    act -P ubuntu-latest=node:16-alpine
    ```
 
-4. **Workflow not found**
+5. **Workflow not found**
    ```bash
    # Make sure you're in the repository root
    # Check workflow files exist in .github/workflows/
@@ -247,14 +263,46 @@ act -v
 act --dryrun
 ```
 
+## Security
+
+This demo includes comprehensive security measures to prevent accidental commits of sensitive information:
+
+### Protected Files
+The `.gitignore` file protects:
+- Environment variables (`.env`, `.env.*`)
+- Secrets files (`.secrets`, `.secrets.*`)
+- API keys and certificates (`*.key`, `*.pem`, `*.p12`, etc.)
+- Database files (`*.db`, `*.sqlite`)
+- Cloud provider credentials (`.aws/`, `.azure/`, `service-account*.json`)
+- Any files matching patterns: `*secret*`, `*password*`, `*private*`, `*credentials*`
+
+### Security Verification
+```bash
+# Run security check
+make security
+
+# Or directly
+./verify-gitignore.sh
+```
+
+### Best Practices
+- Always use `.example` files for templates (e.g., `.env.example`)
+- Never commit real API keys or passwords
+- Review staged files before committing: `git diff --staged`
+- Use the security verification script regularly
+
+See `SECURITY.md` for detailed security guidelines.
+
 ## Files in This Demo
 
 - `README.md` - This documentation
+- `SECURITY.md` - Security guidelines and best practices
 - `.github/workflows/` - GitHub Actions workflow files
 - `src/` - Sample application code
 - `package.json` - Node.js dependencies
-- `.gitignore` - Git ignore patterns
+- `.gitignore` - Git ignore patterns (includes comprehensive security patterns)
 - `.actrc` - act configuration (optional)
+- `verify-gitignore.sh` - Security verification script
 
 ## Resources
 
