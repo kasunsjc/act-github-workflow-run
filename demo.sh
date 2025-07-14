@@ -103,10 +103,18 @@ fi
 
 wait_for_user
 
-# 6. Run simple CI workflow
-print_header "6. Running Simple CI Workflow"
-print_command "act -W .github/workflows/simple-ci.yml"
-act -W .github/workflows/simple-ci.yml
+# 6. Run simple CI workflow (act-compatible)
+print_header "6. Running Simple CI Workflow (Act Compatible)"
+print_command "act -W .github/workflows/simple-ci-no-actions.yml"
+act -W .github/workflows/simple-ci-no-actions.yml
+
+wait_for_user
+
+# 6b. Run artifacts demo (act-compatible)
+print_header "6b. Running Artifacts Demo (Act Compatible)"
+print_command "act -W .github/workflows/artifacts-act-compatible.yml"
+echo "This demonstrates artifact-like functionality using local files and tar archives:"
+act -W .github/workflows/artifacts-act-compatible.yml
 
 wait_for_user
 

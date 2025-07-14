@@ -11,7 +11,8 @@ help:
 	@echo "  make list           - List all workflows"
 	@echo "  make run            - Run all workflows"
 	@echo "  make test           - Run test workflow"
-	@echo "  make ci             - Run CI workflow"
+	@echo "  make ci             - Run CI workflow (act-compatible)"
+	@echo "  make artifacts      - Run artifacts demo (act-compatible)"
 	@echo "  make demo           - Run interactive demo"
 	@echo "  make security       - Run security verification"
 	@echo "  make verify-gitignore - Verify gitignore configuration"
@@ -44,7 +45,11 @@ test:
 
 # Run CI workflow
 ci:
-	act -W .github/workflows/simple-ci.yml
+	act -W .github/workflows/simple-ci-no-actions.yml
+
+# Run artifacts demo (act-compatible)
+artifacts:
+	act -W .github/workflows/artifacts-act-compatible.yml
 
 # Run interactive demo
 demo:

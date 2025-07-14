@@ -1,0 +1,131 @@
+name: Artifacts Demo (Act Compatible)
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build-and-package:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Show current directory
+      run: |
+        echo "Current directory: $(pwd)"
+        echo "Available files:"
+        ls -la
+        
+    - name: Setup Node.js (using pre-installed)
+      run: |
+        echo "Node.js version: $(node --version)"
+        echo "NPM version: $(npm --version)"
+        
+    - name: Install dependencies
+      run: |
+        if [ -f package.json ]; then
+          npm ci
+        else
+          echo "No package.json found, skipping dependency installation"
+        fi
+      
+    - name: Build application
+      run: |
+        if [ -f package.json ]; then
+          npm run build
+        else
+          echo "Manual build process..."
+          mkdir -p dist
+          if [ -d src ]; then
+            cp -r src/* dist/ 2>/dev/null || echo "No src files to copy"
+          fi
+          echo "Build completed"
+        fi
+      
+    - name: Create test reports
+      run: |
+        mkdir -p reports
+        echo "Test results: PASSED" > reports/test-results.txt
+        echo "Coverage: 95%" > reports/coverage.txt
+        echo "Build timestamp: $(date)" > reports/build-info.txt
+        echo "Node version: $(node --version)" >> reports/build-info.txt
+        
+    - name: Package build artifacts (act-compatible)
+      run: |
+        echo "📦 Creating artifact packages..."
+        mkdir -p artifacts
+        
+        # Package build files
+        if [ -d dist ]; then
+          tar -czf artifacts/build-files.tar.gz -C dist .
+          echo "✅ Build files packaged: artifacts/build-files.tar.gz"
+        else
+          echo "⚠️  No dist directory found"
+        fi
+        
+        # Package test reports
+        if [ -d reports ]; then
+          tar -czf artifacts/test-reports.tar.gz -C reports .
+          echo "✅ Test reports packaged: artifacts/test-reports.tar.gz"
+        else
+          echo "⚠️  No reports directory found"
+        fi
+        
+    - name: Verify artifacts
+      run: |
+        echo "📋 Artifact Summary:"
+        echo "===================="
+        if [ -d artifacts ]; then
+          ls -la artifacts/
+          echo ""
+          echo "📊 Artifact Details:"
+          for file in artifacts/*.tar.gz; do
+            if [ -f "$file" ]; then
+              echo "File: $file"
+              echo "Size: $(du -h "$file" | cut -f1)"
+              echo "Contents:"
+              tar -tzf "$file" | head -10
+              echo "---"
+            fi
+          done
+        else
+          echo "❌ No artifacts directory found"
+        fi
+        
+    - name: Simulate artifact download and usage
+      run: |
+        echo "🔽 Simulating artifact download and extraction..."
+        mkdir -p downloaded
+        
+        # Extract build files
+        if [ -f artifacts/build-files.tar.gz ]; then
+          mkdir -p downloaded/build
+          tar -xzf artifacts/build-files.tar.gz -C downloaded/build
+          echo "✅ Build files extracted to: downloaded/build/"
+          echo "📁 Build contents:"
+          ls -la downloaded/build/
+        fi
+        
+        # Extract test reports
+        if [ -f artifacts/test-reports.tar.gz ]; then
+          mkdir -p downloaded/reports
+          tar -xzf artifacts/test-reports.tar.gz -C downloaded/reports
+          echo "✅ Test reports extracted to: downloaded/reports/"
+          echo "📁 Report contents:"
+          ls -la downloaded/reports/
+          echo ""
+          echo "📄 Test Results:"
+          cat downloaded/reports/*.txt || echo "No report files found"
+        fi
+        
+    - name: Cleanup demonstration
+      run: |
+        echo "🧹 Cleanup (demonstration only)..."
+        echo "In a real scenario, you might:"
+        echo "- Deploy the extracted build files"
+        echo "- Send reports to a monitoring system"
+        echo "- Archive artifacts to a storage service"
+        echo "- Clean up temporary files"
+        
+        echo ""
+        echo "🎉 Artifact demo completed successfully!"
+        echo "Total artifacts created: $(ls artifacts/*.tar.gz 2>/dev/null | wc -l)"

@@ -76,11 +76,14 @@ docker ps
 
 This demo includes several workflows to showcase different `act` capabilities:
 
-1. **Simple CI Workflow** (`.github/workflows/simple-ci.yml`) - Basic build and test
-2. **Multi-OS Workflow** (`.github/workflows/multi-os.yml`) - Testing across different operating systems
+1. **Simple CI Workflow** (`.github/workflows/simple-ci-no-actions.yml`) - Basic build and test (act-compatible)
+2. **Multi-OS Workflow** (`.github/workflows/multi-os.yml`) - Testing across different operating systems (GitHub only)
 3. **Environment Variables** (`.github/workflows/env-vars.yml`) - Working with secrets and environment variables
-4. **Artifacts Demo** (`.github/workflows/artifacts.yml`) - Uploading and downloading artifacts
-5. **Matrix Strategy** (`.github/workflows/matrix.yml`) - Matrix builds with different versions
+4. **Artifacts Demo** (`.github/workflows/artifacts-act-compatible.yml`) - File-based artifacts demo (act-compatible)
+5. **Matrix Strategy** (`.github/workflows/matrix.yml`) - Matrix builds with different versions (GitHub only)
+6. **Hybrid Workflow** (`.github/workflows/artifacts-hybrid.yml`) - Works with both act and GitHub Actions
+
+**Note**: Some workflows use GitHub Actions features (like `actions/upload-artifact`) that don't work with `act`. Use the `-act-compatible` versions for local testing.
 
 ## Quick Start
 

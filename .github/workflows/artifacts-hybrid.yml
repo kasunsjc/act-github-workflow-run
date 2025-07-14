@@ -1,0 +1,148 @@
+name: Artifacts Demo (Hybrid)
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build-and-artifacts:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Detect environment
+      id: env-check
+      run: |
+        if [ "$ACT" = "true" ]; then
+          echo "is_act=true" >> $GITHUB_OUTPUT
+          echo "🎭 Running in act (local)"
+        else
+          echo "is_act=false" >> $GITHUB_OUTPUT
+          echo "🐙 Running in GitHub Actions"
+        fi
+        
+    - name: Checkout code (GitHub Actions only)
+      if: steps.env-check.outputs.is_act != 'true'
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js (GitHub Actions only)
+      if: steps.env-check.outputs.is_act != 'true'
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Show environment (act only)
+      if: steps.env-check.outputs.is_act == 'true'
+      run: |
+        echo "Current directory: $(pwd)"
+        echo "Node.js version: $(node --version)"
+        echo "NPM version: $(npm --version)"
+        ls -la
+        
+    - name: Install dependencies
+      run: |
+        if [ -f package.json ]; then
+          npm ci
+        else
+          echo "No package.json found, skipping dependency installation"
+        fi
+      
+    - name: Build application
+      run: |
+        if [ -f package.json ]; then
+          npm run build
+        else
+          echo "Manual build process..."
+          mkdir -p dist
+          if [ -d src ]; then
+            cp -r src/* dist/ 2>/dev/null || echo "No src files to copy"
+          fi
+          echo "Build completed"
+        fi
+      
+    - name: Create test reports
+      run: |
+        mkdir -p reports
+        echo "Test results: PASSED" > reports/test-results.txt
+        echo "Coverage: 95%" > reports/coverage.txt
+        echo "Build timestamp: $(date)" > reports/build-info.txt
+        echo "Environment: $(if [ "$ACT" = "true" ]; then echo "act"; else echo "github"; fi)" >> reports/build-info.txt
+        
+    # GitHub Actions artifacts
+    - name: Upload build artifacts (GitHub Actions)
+      if: steps.env-check.outputs.is_act != 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-files
+        path: dist/
+        
+    - name: Upload test reports (GitHub Actions)
+      if: steps.env-check.outputs.is_act != 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-reports
+        path: reports/
+        
+    # Act-compatible artifacts
+    - name: Package artifacts (act)
+      if: steps.env-check.outputs.is_act == 'true'
+      run: |
+        echo "📦 Creating act-compatible artifact packages..."
+        mkdir -p artifacts
+        
+        # Package build files
+        if [ -d dist ]; then
+          tar -czf artifacts/build-files.tar.gz -C dist .
+          echo "✅ Build files packaged"
+        fi
+        
+        # Package test reports
+        if [ -d reports ]; then
+          tar -czf artifacts/test-reports.tar.gz -C reports .
+          echo "✅ Test reports packaged"
+        fi
+        
+        echo "📋 Created artifacts:"
+        ls -la artifacts/
+        
+    - name: Verify artifacts (act)
+      if: steps.env-check.outputs.is_act == 'true'
+      run: |
+        echo "🔍 Verifying act artifacts..."
+        for file in artifacts/*.tar.gz; do
+          if [ -f "$file" ]; then
+            echo "📦 $file:"
+            echo "  Size: $(du -h "$file" | cut -f1)"
+            echo "  Contents: $(tar -tzf "$file" | wc -l) files"
+          fi
+        done
+        
+  # This job only runs in GitHub Actions (not in act)
+  download-and-verify:
+    runs-on: ubuntu-latest
+    needs: build-and-artifacts
+    if: github.actor != 'nektos/act'
+    
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-files
+        path: ./downloaded-build
+        
+    - name: Download test reports
+      uses: actions/download-artifact@v4
+      with:
+        name: test-reports
+        path: ./downloaded-reports
+        
+    - name: Verify downloaded artifacts
+      run: |
+        echo "🔍 Verifying downloaded artifacts..."
+        echo "Build files:"
+        ls -la ./downloaded-build
+        echo ""
+        echo "Test reports:"
+        ls -la ./downloaded-reports
+        echo ""
+        echo "📄 Report contents:"
+        cat ./downloaded-reports/*.txt
