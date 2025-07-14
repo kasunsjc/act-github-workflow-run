@@ -1,0 +1,37 @@
+name: Environment Variables & Secrets
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  env-demo:
+    runs-on: ubuntu-latest
+    
+    env:
+      NODE_ENV: production
+      APP_NAME: act-demo
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Display environment variables
+      run: |
+        echo "NODE_ENV: $NODE_ENV"
+        echo "APP_NAME: $APP_NAME"
+        echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
+        echo "GITHUB_REF: $GITHUB_REF"
+        echo "GITHUB_SHA: $GITHUB_SHA"
+        
+    - name: Use secrets (demo)
+      run: |
+        echo "API Key length: ${#API_KEY}"
+        echo "Token exists: $([[ -n "$GITHUB_TOKEN" ]] && echo "yes" || echo "no")"
+      env:
+        API_KEY: ${{ secrets.API_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Conditional step based on env
+      if: env.NODE_ENV == 'production'
+      run: echo "Running in production mode"

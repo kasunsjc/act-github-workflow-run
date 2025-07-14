@@ -1,0 +1,19 @@
+# Example configuration file for act
+# Copy this to .actrc to use these settings by default
+
+# Use specific Docker images for better compatibility
+-P ubuntu-latest=catthehacker/ubuntu:act-latest
+-P ubuntu-20.04=catthehacker/ubuntu:act-20.04
+-P ubuntu-18.04=catthehacker/ubuntu:act-18.04
+
+# Load secrets from file (create .secrets file with your secrets)
+--secret-file .secrets
+
+# Load environment variables from file (create .env file)
+--env-file .env
+
+# Use verbose output for debugging
+# -v
+
+# Don't pull Docker images automatically (useful if you want to manage images manually)
+# --pull=false

@@ -1,0 +1,17 @@
+{
+  "name": "act-demo",
+  "version": "1.0.0",
+  "description": "Demo application for GitHub Actions local runner (act)",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "build": "mkdir -p dist && cp src/* dist/",
+    "test": "node src/test.js",
+    "lint": "echo 'Linting passed - no linter configured for demo'"
+  },
+  "keywords": ["github-actions", "act", "demo"],
+  "author": "Demo Author",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {}
+}

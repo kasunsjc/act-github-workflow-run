@@ -1,0 +1,40 @@
+name: Act Test Workflow
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  hello-act:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Hello from Act
+      run: |
+        echo "🎭 Hello from GitHub Actions local runner (act)!"
+        echo "This workflow is running locally using act"
+        
+    - name: Check runner environment
+      run: |
+        echo "Runner OS: $RUNNER_OS"
+        echo "Home directory: $HOME"
+        echo "Workspace: $GITHUB_WORKSPACE"
+        echo "Current user: $(whoami)"
+        echo "Current directory: $(pwd)"
+        
+    - name: Test environment variables
+      run: |
+        echo "NODE_ENV: ${NODE_ENV:-not set}"
+        echo "APP_NAME: ${APP_NAME:-not set}"
+      env:
+        NODE_ENV: ${{ env.NODE_ENV }}
+        APP_NAME: ${{ env.APP_NAME }}
+        
+    - name: Simple shell commands
+      run: |
+        echo "Date: $(date)"
+        echo "Available disk space:"
+        df -h
+        echo "Memory info:"
+        free -h || echo "free command not available"
